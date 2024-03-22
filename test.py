@@ -29,4 +29,7 @@ if __name__ == '__main__':
         workers.start()
     master.start()
 
-    logging.debug('End program')
+    logging.debug('End program')\
+    
+
+    
