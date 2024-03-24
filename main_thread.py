@@ -10,12 +10,12 @@ class ScanFolder():
     def __init__(self, default_folder):
         self.default_folder = default_folder
         self.cash = {
-            "images_cash" : [],
-            "video_cash" : [],
-            "documents_cash" : [],
-            "audio_cash" : [],
-            "archives_cash" : [],
-            "others_cash" : [],
+            "images" : [],
+            "video" : [],
+            "documents" : [],
+            "audio" : [],
+            "archives" : [],
+            "others" : [],
         }
 
     def start_scan(self, target_folder):
@@ -27,6 +27,7 @@ class ScanFolder():
                 if elem.is_file():
                     suffix = self.suffix_file(elem)
                     self.sort_file(elem, suffix)
+                    
              
     def suffix_file(self, elem):
         """Function find Suffix"""
@@ -36,17 +37,17 @@ class ScanFolder():
     def sort_file(self, file, sufiix):
         """Function sotr file"""
         if sufiix in ('JPEG', 'PNG', 'JPG', 'SVG'): 
-            self.cash["images_cash"].append(file)
+            self.cash["images"].append(file)
         elif sufiix in ('AVI', 'MP4', 'MOV', 'MKV'):
-            self.cash["video_cash"].append(file)
+            self.cash["video"].append(file)
         elif sufiix in ('DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'):
-            self.cash["documents_cash"].append(file)
+            self.cash["documents"].append(file)
         elif sufiix in ('MP3', 'OGG', 'WAV', 'AMR'):
-            self.cash["audio_cash"].append(file)
+            self.cash["audio"].append(file)
         elif sufiix in ('ZIP', 'GZ', 'TAR'):
-            self.cash["archives_cash"].append(file)
+            self.cash["archives"].append(file)
         else:
-            self.cash["others_cash"].append(file)
+            self.cash["others"].append(file)
 
     def work_to_cash(self, cash, folder):
         """Function move file"""
@@ -84,10 +85,16 @@ def main():
 
     tr = Thread(target=scan.start_scan, args=(target_folders, ))
     tr.start()
+    tr.join()
 
+    poll_thread = []
     for key, value in scan.cash.items():
         tred = Thread(target=scan.work_to_cash, args=(value, key))
         tred.start()
+        poll_thread.append(tred)
+
+    for i in poll_thread:
+        i.join()
 
     scan.delete_folder(target_folders)
     print(f"Thred: {active_count()}")
